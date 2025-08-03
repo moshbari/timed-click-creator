@@ -18,6 +18,7 @@ interface ButtonConfig {
   textColor: string;
   fontSize: string;
   fontWeight: string;
+  fontFamily: string;
   buttonText: string;
   linkUrl: string;
   delaySeconds: number;
@@ -35,6 +36,7 @@ const ButtonGenerator = () => {
     textColor: '#ffffff',
     fontSize: '16px',
     fontWeight: 'bold',
+    fontFamily: 'Arial, sans-serif',
     buttonText: 'Click Me!',
     linkUrl: 'https://example.com',
     delaySeconds: 3,
@@ -76,6 +78,7 @@ const ButtonGenerator = () => {
             color: ${config.textColor};
             font-size: ${config.fontSize};
             font-weight: ${config.fontWeight};
+            font-family: ${config.fontFamily};
             text-decoration: none;
             border-radius: 8px;
             cursor: pointer;
@@ -284,6 +287,27 @@ const ButtonGenerator = () => {
               </div>
 
               <div>
+                <Label htmlFor="fontFamily">Font Family</Label>
+                <Select value={config.fontFamily} onValueChange={(value) => updateConfig('fontFamily', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select font family" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Arial, sans-serif">Arial</SelectItem>
+                    <SelectItem value="Helvetica, sans-serif">Helvetica</SelectItem>
+                    <SelectItem value="'Times New Roman', serif">Times New Roman</SelectItem>
+                    <SelectItem value="Georgia, serif">Georgia</SelectItem>
+                    <SelectItem value="'Courier New', monospace">Courier New</SelectItem>
+                    <SelectItem value="Verdana, sans-serif">Verdana</SelectItem>
+                    <SelectItem value="'Trebuchet MS', sans-serif">Trebuchet MS</SelectItem>
+                    <SelectItem value="Impact, sans-serif">Impact</SelectItem>
+                    <SelectItem value="'Comic Sans MS', cursive">Comic Sans MS</SelectItem>
+                    <SelectItem value="'Lucida Console', monospace">Lucida Console</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label htmlFor="buttonText">Button Text</Label>
                 <Input
                   id="buttonText"
@@ -362,6 +386,7 @@ const ButtonGenerator = () => {
                         color: config.textColor,
                         fontSize: config.fontSize,
                         fontWeight: config.fontWeight,
+                        fontFamily: config.fontFamily,
                         textDecoration: 'none',
                         borderRadius: '8px',
                         cursor: 'pointer'
