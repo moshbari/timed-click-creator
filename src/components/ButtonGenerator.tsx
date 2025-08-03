@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Copy, Eye, Code, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,6 +21,7 @@ interface ButtonConfig {
   buttonText: string;
   linkUrl: string;
   delaySeconds: number;
+  alignment: string;
 }
 
 const ButtonGenerator = () => {
@@ -35,7 +37,8 @@ const ButtonGenerator = () => {
     fontWeight: 'bold',
     buttonText: 'Click Me!',
     linkUrl: 'https://example.com',
-    delaySeconds: 3
+    delaySeconds: 3,
+    alignment: 'center'
   });
 
   const [showPreview, setShowPreview] = useState(false);
@@ -60,6 +63,10 @@ const ButtonGenerator = () => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timed Button</title>
     <style>
+        .button-container {
+            text-align: ${config.alignment};
+        }
+        
         .timed-button {
             display: none;
             width: ${config.width};
@@ -94,9 +101,11 @@ const ButtonGenerator = () => {
     </style>
 </head>
 <body>
-    <a href="${config.linkUrl}" target="_blank" rel="noopener noreferrer" class="timed-button" id="timedButton">
-        ${config.buttonText}
-    </a>
+    <div class="button-container">
+        <a href="${config.linkUrl}" target="_blank" rel="noopener noreferrer" class="timed-button" id="timedButton">
+            ${config.buttonText}
+        </a>
+    </div>
 
     <script>
         window.addEventListener('load', function() {
@@ -294,16 +303,31 @@ const ButtonGenerator = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="delaySeconds">Delay (seconds)</Label>
-                <Input
-                  id="delaySeconds"
-                  type="number"
-                  min="0"
-                  value={config.delaySeconds}
-                  onChange={(e) => updateConfig('delaySeconds', parseInt(e.target.value) || 0)}
-                  placeholder="3"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="delaySeconds">Delay (seconds)</Label>
+                  <Input
+                    id="delaySeconds"
+                    type="number"
+                    min="0"
+                    value={config.delaySeconds}
+                    onChange={(e) => updateConfig('delaySeconds', parseInt(e.target.value) || 0)}
+                    placeholder="3"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="alignment">Button Alignment</Label>
+                  <Select value={config.alignment} onValueChange={(value) => updateConfig('alignment', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select alignment" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -320,7 +344,10 @@ const ButtonGenerator = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-muted/20 p-8 rounded-lg min-h-[120px] flex items-center justify-center">
+                <div 
+                  className="bg-muted/20 p-8 rounded-lg min-h-[120px] flex items-center"
+                  style={{ justifyContent: config.alignment === 'center' ? 'center' : config.alignment === 'left' ? 'flex-start' : 'flex-end' }}
+                >
                   {showPreview ? (
                     <a
                       href={config.linkUrl}
