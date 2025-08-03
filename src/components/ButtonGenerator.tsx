@@ -70,7 +70,6 @@ const ButtonGenerator = () => {
         }
         
         .timed-button {
-            display: none;
             width: ${config.width};
             height: ${config.height};
             background-color: ${config.backgroundColor};
@@ -91,7 +90,6 @@ const ButtonGenerator = () => {
         }
         
         .timed-button.show {
-            display: inline-flex;
             opacity: 1;
             transform: translateY(0);
         }
