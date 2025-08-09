@@ -21,6 +21,8 @@ interface ButtonConfig {
   fontFamily: string;
   buttonText: string;
   linkUrl: string;
+  delayHours: number;
+  delayMinutes: number;
   delaySeconds: number;
   alignment: string;
 }
@@ -28,34 +30,41 @@ interface ButtonConfig {
 const ButtonGenerator = () => {
   const { toast } = useToast();
   const [config, setConfig] = useState<ButtonConfig>({
-    width: '200px',
-    height: '50px',
+    width: '800px',
+    height: '80px',
     backgroundColor: '#3b82f6',
-    borderWidth: '2px',
+    borderWidth: '4px',
     borderColor: '#1d4ed8',
     textColor: '#ffffff',
-    fontSize: '16px',
+    fontSize: '32px',
     fontWeight: 'bold',
-    fontFamily: 'Arial, sans-serif',
-    buttonText: 'Click Me!',
-    linkUrl: 'https://example.com',
+    fontFamily: 'Verdana, sans-serif',
+    buttonText: 'Click Here to Secure Your Spot Now',
+    linkUrl: 'https://99dfy.com',
+    delayHours: 0,
+    delayMinutes: 0,
     delaySeconds: 3,
     alignment: 'center'
   });
 
   const [showPreview, setShowPreview] = useState(false);
 
+  const getTotalDelayMs = () => {
+    return (config.delayHours * 3600 + config.delayMinutes * 60 + config.delaySeconds) * 1000;
+  };
+
   useEffect(() => {
-    if (config.delaySeconds > 0) {
+    const totalDelay = getTotalDelayMs();
+    if (totalDelay > 0) {
       setShowPreview(false);
       const timer = setTimeout(() => {
         setShowPreview(true);
-      }, config.delaySeconds * 1000);
+      }, totalDelay);
       return () => clearTimeout(timer);
     } else {
       setShowPreview(true);
     }
-  }, [config.delaySeconds]);
+  }, [config.delayHours, config.delayMinutes, config.delaySeconds]);
 
   const generateCode = () => {
     return `<!DOCTYPE html>
@@ -113,7 +122,7 @@ const ButtonGenerator = () => {
             setTimeout(function() {
                 const button = document.getElementById('timedButton');
                 button.classList.add('show');
-            }, ${config.delaySeconds * 1000});
+            }, ${(config.delayHours * 3600 + config.delayMinutes * 60 + config.delaySeconds) * 1000});
         });
     </script>
 </body>
@@ -325,31 +334,59 @@ const ButtonGenerator = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="delaySeconds">Delay (seconds)</Label>
-                  <Input
-                    id="delaySeconds"
-                    type="number"
-                    min="0"
-                    value={config.delaySeconds}
-                    onChange={(e) => updateConfig('delaySeconds', parseInt(e.target.value) || 0)}
-                    placeholder="3"
-                  />
+              <div>
+                <Label>Delay Time</Label>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="delayHours" className="text-sm text-muted-foreground">Hours</Label>
+                    <Input
+                      id="delayHours"
+                      type="number"
+                      min="0"
+                      value={config.delayHours}
+                      onChange={(e) => updateConfig('delayHours', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="delayMinutes" className="text-sm text-muted-foreground">Minutes</Label>
+                    <Input
+                      id="delayMinutes"
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={config.delayMinutes}
+                      onChange={(e) => updateConfig('delayMinutes', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="delaySeconds" className="text-sm text-muted-foreground">Seconds</Label>
+                    <Input
+                      id="delaySeconds"
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={config.delaySeconds}
+                      onChange={(e) => updateConfig('delaySeconds', parseInt(e.target.value) || 0)}
+                      placeholder="3"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="alignment">Button Alignment</Label>
-                  <Select value={config.alignment} onValueChange={(value) => updateConfig('alignment', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select alignment" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="left">Left</SelectItem>
-                      <SelectItem value="center">Center</SelectItem>
-                      <SelectItem value="right">Right</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="alignment">Button Alignment</Label>
+                <Select value={config.alignment} onValueChange={(value) => updateConfig('alignment', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select alignment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="left">Left</SelectItem>
+                    <SelectItem value="center">Center</SelectItem>
+                    <SelectItem value="right">Right</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
@@ -362,7 +399,9 @@ const ButtonGenerator = () => {
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-5 w-5" />
                   Live Preview
-                  <Badge variant="secondary">Resets every {config.delaySeconds}s</Badge>
+                  <Badge variant="secondary">
+                    Resets every {config.delayHours > 0 ? `${config.delayHours}h ` : ''}{config.delayMinutes > 0 ? `${config.delayMinutes}m ` : ''}{config.delaySeconds}s
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -393,7 +432,9 @@ const ButtonGenerator = () => {
                       {config.buttonText}
                     </a>
                   ) : (
-                    <div className="text-muted-foreground">Button will appear in {config.delaySeconds} seconds...</div>
+                    <div className="text-muted-foreground">
+                      Button will appear in {config.delayHours > 0 ? `${config.delayHours}h ` : ''}{config.delayMinutes > 0 ? `${config.delayMinutes}m ` : ''}{config.delaySeconds}s...
+                    </div>
                   )}
                 </div>
               </CardContent>
