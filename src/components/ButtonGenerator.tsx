@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Copy, Eye, Code, Download } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Copy, Eye, Code, Download, FileText, FileCode, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ButtonConfig {
@@ -66,7 +67,7 @@ const ButtonGenerator = () => {
     }
   }, [config.delayHours, config.delayMinutes, config.delaySeconds]);
 
-  const generateCode = () => {
+  const generateHTML = () => {
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,7 +122,9 @@ const ButtonGenerator = () => {
         window.addEventListener('load', function() {
             setTimeout(function() {
                 const button = document.getElementById('timedButton');
-                button.classList.add('show');
+                if (button) {
+                    button.classList.add('show');
+                }
             }, ${(config.delayHours * 3600 + config.delayMinutes * 60 + config.delaySeconds) * 1000});
         });
     </script>
@@ -129,12 +132,54 @@ const ButtonGenerator = () => {
 </html>`;
   };
 
-  const copyToClipboard = async () => {
+  const generateJS = () => {
+    return `// Timed Button Script
+// Place this script in your page's footer or use your page builder's custom JS section
+
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        const button = document.getElementById('timedButton');
+        if (button) {
+            button.classList.add('show');
+        }
+    }, ${(config.delayHours * 3600 + config.delayMinutes * 60 + config.delaySeconds) * 1000});
+});`;
+  };
+
+  const generateHTMLOnly = () => {
+    return `<!-- Timed Button HTML -->
+<!-- Paste this HTML where you want the button to appear -->
+<div class="button-container" style="text-align: ${config.alignment};">
+    <a href="${config.linkUrl}" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       class="timed-button" 
+       id="timedButton"
+       style="width: ${config.width}; height: ${config.height}; background-color: ${config.backgroundColor}; border: ${config.borderWidth} solid ${config.borderColor}; color: ${config.textColor}; font-size: ${config.fontSize}; font-weight: ${config.fontWeight}; font-family: ${config.fontFamily}; text-decoration: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(20px);">
+        ${config.buttonText}
+    </a>
+</div>
+
+<style>
+.timed-button.show {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.timed-button:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+</style>`;
+  };
+
+  const copyToClipboard = async (content: string, title: string) => {
     try {
-      await navigator.clipboard.writeText(generateCode());
+      await navigator.clipboard.writeText(content);
       toast({
-        title: "Code copied!",
-        description: "The HTML code has been copied to your clipboard.",
+        title: `${title} copied!`,
+        description: "The code has been copied to your clipboard.",
       });
     } catch (err) {
       toast({
@@ -145,13 +190,12 @@ const ButtonGenerator = () => {
     }
   };
 
-  const downloadCode = () => {
-    const code = generateCode();
-    const blob = new Blob([code], { type: 'text/html' });
+  const downloadFile = (content: string, filename: string, type: string) => {
+    const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'timed-button.html';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -159,7 +203,7 @@ const ButtonGenerator = () => {
     
     toast({
       title: "Download started!",
-      description: "The HTML file has been downloaded.",
+      description: `The ${filename} file has been downloaded.`,
     });
   };
 
@@ -443,29 +487,139 @@ const ButtonGenerator = () => {
             {/* Generated Code */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Code className="h-5 w-5" />
-                    Generated HTML Code
-                  </div>
-                  <div className="flex gap-2">
-                    <Button onClick={copyToClipboard} variant="outline" size="sm">
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </Button>
-                    <Button onClick={downloadCode} variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="h-5 w-5" />
+                  Generated Code
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Textarea
-                  value={generateCode()}
-                  readOnly
-                  className="min-h-[300px] font-mono text-sm bg-code-bg"
-                />
+                <Tabs defaultValue="complete" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="complete" className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Complete HTML
+                    </TabsTrigger>
+                    <TabsTrigger value="separate" className="flex items-center gap-2">
+                      <FileCode className="h-4 w-4" />
+                      HTML Only
+                    </TabsTrigger>
+                    <TabsTrigger value="javascript" className="flex items-center gap-2">
+                      <FileCode className="h-4 w-4" />
+                      JavaScript
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="complete" className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">Complete HTML file with embedded JavaScript</p>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => copyToClipboard(generateHTML(), "Complete HTML")} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy
+                        </Button>
+                        <Button 
+                          onClick={() => downloadFile(generateHTML(), 'timed-button.html', 'text/html')} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                    <Textarea
+                      value={generateHTML()}
+                      readOnly
+                      className="min-h-[300px] font-mono text-sm bg-code-bg"
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="separate" className="space-y-4">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-amber-800">For Page Builders</p>
+                          <p className="text-sm text-amber-700 mt-1">
+                            Use this HTML in your page builder's HTML editor, then add the JavaScript separately in your page's custom JS section or footer.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">HTML code only (requires separate JavaScript)</p>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => copyToClipboard(generateHTMLOnly(), "HTML Only")} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy
+                        </Button>
+                        <Button 
+                          onClick={() => downloadFile(generateHTMLOnly(), 'timed-button.html', 'text/html')} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                    <Textarea
+                      value={generateHTMLOnly()}
+                      readOnly
+                      className="min-h-[300px] font-mono text-sm bg-code-bg"
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="javascript" className="space-y-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-blue-800">JavaScript Instructions</p>
+                          <ul className="text-sm text-blue-700 mt-1 space-y-1">
+                            <li>• Add this script to your page's footer</li>
+                            <li>• Or paste it in your page builder's custom JavaScript section</li>
+                            <li>• Make sure it loads after the HTML content</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">JavaScript code for timed button functionality</p>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => copyToClipboard(generateJS(), "JavaScript")} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy
+                        </Button>
+                        <Button 
+                          onClick={() => downloadFile(generateJS(), 'timed-button.js', 'text/javascript')} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                    <Textarea
+                      value={generateJS()}
+                      readOnly
+                      className="min-h-[300px] font-mono text-sm bg-code-bg"
+                    />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
