@@ -80,12 +80,13 @@ const ButtonGenerator = () => {
         }
         
         .timed-button {
-            width: ${config.width};
+            max-width: min(${config.width}, 90vw);
+            width: 100%;
             height: ${config.height};
             background-color: ${config.backgroundColor};
             border: ${config.borderWidth} solid ${config.borderColor};
             color: ${config.textColor};
-            font-size: ${config.fontSize};
+            font-size: min(${config.fontSize}, 4vw);
             font-weight: ${config.fontWeight};
             font-family: ${config.fontFamily};
             text-decoration: none;
@@ -97,6 +98,26 @@ const ButtonGenerator = () => {
             justify-content: center;
             opacity: 0;
             transform: translateY(20px);
+            padding: 0.5rem 1rem;
+            box-sizing: border-box;
+        }
+        
+        @media (max-width: 768px) {
+            .timed-button {
+                max-width: 95vw;
+                height: auto;
+                min-height: calc(${config.height} * 0.7);
+                font-size: min(${config.fontSize}, 5vw);
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .timed-button {
+                max-width: 98vw;
+                font-size: min(${config.fontSize}, 6vw);
+                padding: 0.8rem;
+            }
         }
         
         .timed-button.show {
@@ -155,7 +176,7 @@ window.addEventListener('load', function() {
        rel="noopener noreferrer" 
        class="timed-button" 
        id="timedButton"
-       style="width: ${config.width}; height: ${config.height}; background-color: ${config.backgroundColor}; border: ${config.borderWidth} solid ${config.borderColor}; color: ${config.textColor}; font-size: ${config.fontSize}; font-weight: ${config.fontWeight}; font-family: ${config.fontFamily}; text-decoration: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(20px);">
+       style="max-width: min(${config.width}, 90vw); width: 100%; height: ${config.height}; background-color: ${config.backgroundColor}; border: ${config.borderWidth} solid ${config.borderColor}; color: ${config.textColor}; font-size: min(${config.fontSize}, 4vw); font-weight: ${config.fontWeight}; font-family: ${config.fontFamily}; text-decoration: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(20px); padding: 0.5rem 1rem; box-sizing: border-box;">
         ${config.buttonText}
     </a>
 </div>
@@ -170,6 +191,24 @@ window.addEventListener('load', function() {
     opacity: 0.9 !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+@media (max-width: 768px) {
+    .timed-button {
+        max-width: 95vw !important;
+        height: auto !important;
+        min-height: calc(${config.height} * 0.7) !important;
+        font-size: min(${config.fontSize}, 5vw) !important;
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .timed-button {
+        max-width: 98vw !important;
+        font-size: min(${config.fontSize}, 6vw) !important;
+        padding: 0.8rem !important;
+    }
 }
 </style>`;
   };
